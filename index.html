@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word of the Day</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #05080f;
+  --surface: #0d1220;
+  --card: #111827;
+  --border: #1e2d45;
+  --ink: #e8f0ff;
+  --ink2: #7889aa;
+  --muted: #3d4f6e;
+  --gold: #f5c842;
+  --teal: #00c4a7;
+  --rose: #ff6b8a;
+  --blue: #5b9cf6;
+  --purple: #a78bfa;
+  --green: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: green;
+  color: blue;
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── STARS BG ── */
+body::before {
+content: ‘’;
+position: fixed; inset: 0; z-index: 0;
+background:
+radial-gradient(ellipse at 20% 20%, rgba(91,156,246,0.07) 0%, transparent 60%),
+radial-gradient(ellipse at 80% 80%, rgba(167,139,250,0.07) 0%, transparent 60%);
+pointer-events: none;
+}
+
+/* ── HEADER ── */
+.header {
+position: relative; z-index: 1;
+padding: 20px 24px 16px;
+display: flex; align-items: center; justify-content: space-between;
+border-bottom: 1px solid var(–border);
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.header-icon {
+width: 40px; height: 40px; border-radius: 10px;
+background: linear-gradient(135deg, var(–gold), #e8a000);
+display: flex; align-items: center; justify-content: center;
+font-size: 1.1rem; flex-shrink: 0;
+}
+.header h1 { font-family: ‘Playfair Display’, serif; font-size: 1.15rem; font-weight: 700; }
+.header h1 span { color: var(–gold); font-style: italic; }
+.streak-badge {
+display: flex; align-items: center; gap: 6px;
+background: rgba(245,200,66,0.1); border: 1px solid rgba(245,200,66,0.25);
+border-radius: 20px; padding: 6px 14px;
+font-size: 0.8rem; font-weight: 600; color: var(–gold);
+}
+
+/* ── PROGRESS BAR ── */
+.progress-strip {
+position: relative; z-index: 1;
+height: 3px; background: var(–border);
+}
+.progress-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–teal), var(–blue));
+transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── MAIN ── */
+.main {
+position: relative; z-index: 1;
+flex: 1;
+max-width: 620px; width: 100%; margin: 0 auto;
+padding: 32px 16px 60px;
+display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ── DAY LABEL ── */
+.day-label {
+display: flex; align-items: center; gap: 10px;
+}
+.day-chip {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
+text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
+background: rgba(0,196,167,0.12); color: var(–teal); border: 1px solid rgba(0,196,167,0.25);
+}
+.day-dots { display: flex; gap: 5px; }
+.dot {
+width: 8px; height: 8px; border-radius: 50%;
+background: var(–border); transition: background 0.3s;
+}
+.dot.seen { background: var(–teal); }
+.dot.current { background: var(–gold); box-shadow: 0 0 6px var(–gold); }
+
+/* ── WORD CARD ── */
+.word-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 24px;
+overflow: hidden;
+position: relative;
+}
+.card-glow {
+position: absolute; top: 0; left: 0; right: 0; height: 2px;
+background: linear-gradient(90deg, var(–teal), var(–blue), var(–purple));
+}
+.card-body { padding: 28px 26px 24px; }
+
+/* Category + type row */
+.word-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+.meta-pill {
+font-size: 0.68rem; font-weight: 700; letter-spacing: 0.06em;
+text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+}
+.pill-verb     { background: rgba(167,139,250,0.15); color: var(–purple); }
+.pill-noun     { background: rgba(91,156,246,0.15); color: var(–blue); }
+.pill-adj      { background: rgba(255,107,138,0.15); color: var(–rose); }
+.pill-phrase   { background: rgba(245,200,66,0.12); color: var(–gold); }
+.pill-adv      { background: rgba(0,196,167,0.12); color: var(–teal); }
+.pill-greeting { background: rgba(52,211,153,0.12); color: var(–green); }
+.difficulty {
+font-size: 0.68rem; font-weight: 600; letter-spacing: 0.05em;
+text-transform: uppercase; color: var(–muted); margin-left: auto;
+}
+
+/* The word */
+.word-en {
+font-family: ‘Playfair Display’, serif;
+font-size: clamp(2.8rem, 10vw, 4.5rem);
+font-weight: 900; line-height: 1;
+background: linear-gradient(135deg, #fff 30%, var(–blue));
+-webkit-background-clip: text; -webkit-text-fill-color: transparent;
+background-clip: text;
+margin-bottom: 6px;
+cursor: pointer; transition: opacity 0.2s;
+}
+.word-en:hover { opacity: 0.85; }
+
+.phonetic {
+font-family: ‘DM Mono’, monospace;
+font-size: 0.88rem; color: var(–ink2);
+margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
+}
+
+/* Audio button */
+.audio-btn {
+display: inline-flex; align-items: center; gap: 7px;
+background: rgba(91,156,246,0.12); border: 1px solid rgba(91,156,246,0.3);
+border-radius: 20px; padding: 6px 14px;
+cursor: pointer; font-size: 0.8rem; font-weight: 600; color: var(–blue);
+transition: all 0.2s; font-family: ‘Outfit’, sans-serif;
+}
+.audio-btn:hover { background: rgba(91,156,246,0.22); }
+.audio-btn.playing { background: rgba(91,156,246,0.25); border-color: var(–blue); }
+@keyframes soundwave {
+0%,100% { transform: scaleY(0.4); }
+50% { transform: scaleY(1.2); }
+}
+.wave-bars { display: flex; align-items: center; gap: 2px; height: 14px; }
+.wb { width: 3px; border-radius: 2px; background: var(–blue); height: 100%; transform-origin: center; }
+.wb1 { animation: soundwave 0.5s 0.0s infinite; }
+.wb2 { animation: soundwave 0.5s 0.1s infinite; }
+.wb3 { animation: soundwave 0.5s 0.2s infinite; }
+.wb4 { animation: soundwave 0.5s 0.1s infinite; }
+.wb-static { width: 3px; height: 100%; background: var(–blue); border-radius: 2px; }
+
+/* Translation */
+.translation-row {
+display: flex; align-items: center; gap: 10px;
+margin: 16px 0 10px;
+padding: 14px 16px;
+background: var(–surface);
+border: 1px solid var(–border);
+border-radius: 12px;
+}
+.arrow-icon { color: var(–muted); font-size: 0.9rem; }
+.word-es { font-size: 1.3rem; font-weight: 700; color: var(–ink); }
+.es-label { font-size: 0.7rem; color: var(–muted); text-transform: uppercase; letter-spacing: 0.06em; margin-left: auto; }
+
+/* ── EXAMPLES ── */
+.examples-card {
+background: var(–card); border: 1px solid var(–border);
+border-radius: 20px; overflow: hidden;
+}
+.examples-header {
+padding: 14px 20px 10px;
+display: flex; align-items: center; gap: 8px;
+border-bottom: 1px solid var(–border);
+}
+.examples-header h3 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(–ink2); }
+.examples-icon { font-size: 0.9rem; }
+
+.example-item {
+padding: 14px 20px;
+border-bottom: 1px solid var(–border);
+display: flex; gap: 12px; align-items: flex-start;
+}
+.example-item:last-child { border-bottom: none; }
+.ex-num {
+width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px;
+background: var(–surface); border: 1px solid var(–border);
+display: flex; align-items: center; justify-content: center;
+font-family: ‘DM Mono’, monospace; font-size: 0.68rem; color: var(–muted);
+margin-top: 2px;
+}
+.ex-content { flex: 1; }
+.ex-en {
+font-size: 0.92rem; line-height: 1.5; color: var(–ink); margin-bottom: 4px;
+}
+.ex-en strong { color: var(–gold); font-weight: 700; }
+.ex-es { font-size: 0.78rem; color: var(–ink2); font-style: italic; }
+.ex-audio {
+width: 30px; height: 30px; flex-shrink: 0;
+background: var(–surface); border: 1px solid var(–border);
+border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+font-size: 0.85rem; transition: all 0.2s;
+}
+.ex-audio:hover { border-color: var(–blue); background: rgba(91,156,246,0.1); }
+
+/* ── USAGE NOTES ── */
+.notes-card {
+background: rgba(245,200,66,0.05);
+border: 1px solid rgba(245,200,66,0.2);
+border-radius: 16px; padding: 16px 20px;
+}
+.notes-card h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(–gold); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.notes-card p { font-size: 0.85rem; line-height: 1.6; color: var(–ink2); }
+.notes-card p strong { color: var(–ink); }
+
+/* ── NAV BUTTONS ── */
+.nav-row {
+display: flex; align-items: center; gap: 10px; margin-top: 4px;
+}
+.nav-btn {
+flex: 1; padding: 14px; border-radius: 14px; border: none; cursor: pointer;
+font-family: ‘Outfit’, sans-serif; font-size: 0.88rem; font-weight: 700;
+transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.btn-prev {
+background: var(–surface); border: 1px solid var(–border); color: var(–ink2);
+}
+.btn-prev:hover { border-color: var(–blue); color: var(–blue); }
+.btn-next {
+background: linear-gradient(135deg, var(–teal), var(–blue));
+color: #fff; box-shadow: 0 4px 20px rgba(0,196,167,0.25);
+}
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,196,167,0.35); }
+.btn-next:active { transform: translateY(0); }
+.btn-prev:disabled { opacity: 0.35; cursor: default; }
+.btn-next.finished { background: linear-gradient(135deg, var(–gold), #e8a000); box-shadow: 0 4px 20px rgba(245,200,66,0.25); }
+
+/* ── COMPLETE SCREEN ── */
+.complete-screen {
+display: none;
+background: var(–card); border: 1px solid var(–border);
+border-radius: 24px; padding: 44px 28px; text-align: center;
+}
+.complete-screen.show { display: block; }
+.complete-trophy { font-size: 4rem; margin-bottom: 16px; }
+.complete-screen h2 {
+font-family: ‘Playfair Display’, serif;
+font-size: 1.8rem; font-weight: 900; margin-bottom: 8px;
+}
+.complete-screen h2 span { color: var(–gold); font-style: italic; }
+.complete-screen p { color: var(–ink2); font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+.complete-stats { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
+.cstat {
+padding: 10px 20px; border-radius: 12px;
+font-size: 0.82rem; font-weight: 700;
+background: var(–surface); border: 1px solid var(–border);
+}
+.cstat span { font-family: ‘DM Mono’, monospace; font-size: 1.2rem; display: block; margin-bottom: 2px; color: var(–gold); }
+.restart-btn {
+background: linear-gradient(135deg, var(–teal), var(–blue));
+color: #fff; border: none; border-radius: 14px;
+padding: 14px 36px; font-family: ‘Outfit’, sans-serif;
+font-size: 0.95rem; font-weight: 700; cursor: pointer;
+transition: all 0.2s; box-shadow: 0 4px 20px rgba(0,196,167,0.25);
+}
+.restart-btn:hover { transform: translateY(-2px); }
+
+/* ── ANIMATIONS ── */
+@keyframes cardIn {
+from { opacity: 0; transform: translateY(16px) scale(0.98); }
+to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.word-card, .examples-card, .notes-card { animation: cardIn 0.4s cubic-bezier(.4,0,.2,1) both; }
+.examples-card { animation-delay: 0.06s; }
+.notes-card    { animation-delay: 0.12s; }
+
+@keyframes wordPop {
+0%   { transform: scale(1); }
+50%  { transform: scale(1.04); }
+100% { transform: scale(1); }
+}
+.word-en.pop { animation: wordPop 0.35s ease; }
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-icon">✨</div>
+    <h1>Word of the <span>Day</span></h1>
+  </div>
+  <div class="streak-badge">🔥 <span id="streak">1</span> día</div>
+</div>
+
+<!-- PROGRESS -->
+
+<div class="progress-strip">
+  <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+</div>
+
+<!-- MAIN -->
+
+<div class="main">
+
+  <!-- Day label + dots -->
+
+  <div class="day-label">
+    <div class="day-chip" id="day-chip">Día 1</div>
+    <div class="day-dots" id="day-dots"></div>
+  </div>
+
+  <!-- Word Card -->
+
+  <div class="word-card" id="word-card">
+    <div class="card-glow"></div>
+    <div class="card-body">
+      <div class="word-meta">
+        <span class="meta-pill" id="w-type-pill"></span>
+        <span class="difficulty" id="w-difficulty"></span>
+      </div>
+      <div class="word-en" id="w-en" onclick="popWord()"></div>
+      <div class="phonetic" id="w-phonetic"></div>
+      <button class="audio-btn" id="audio-main-btn" onclick="speakMain()">
+        <div class="wave-bars" id="wave-main">
+          <div class="wb-static wb1s"></div>
+          <div class="wb-static wb2s"></div>
+          <div class="wb-static wb3s"></div>
+          <div class="wb-static wb4s"></div>
+        </div>
+        Escuchar
+      </button>
+      <div class="translation-row">
+        <span class="arrow-icon">🇪🇸</span>
+        <span class="word-es" id="w-es"></span>
+        <span class="es-label">Español</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Examples -->
+
+  <div class="examples-card" id="examples-card">
+    <div class="examples-header">
+      <span class="examples-icon">📝</span>
+      <h3>Ejemplos en oración</h3>
+    </div>
+    <div id="examples-list"></div>
+  </div>
+
+  <!-- Notes -->
+
+  <div class="notes-card" id="notes-card">
+    <h4>💡 Nota de uso</h4>
+    <p id="w-note"></p>
+  </div>
+
+  <!-- Complete screen -->
+
+  <div class="complete-screen" id="complete-screen">
+    <div class="complete-trophy">🏆</div>
+    <h2>¡Completaste el <span>mazo</span>!</h2>
+    <p>Has repasado todas las palabras del día.<br>Vuelve mañana o repite para reforzar.</p>
+    <div class="complete-stats">
+      <div class="cstat"><span id="cs-total">0</span>Palabras vistas</div>
+      <div class="cstat"><span id="cs-time">0 min</span>Tiempo estudiado</div>
+    </div>
+    <button class="restart-btn" onclick="restart()">↺ Repetir desde el inicio</button>
+  </div>
+
+  <!-- Nav -->
+
+  <div class="nav-row" id="nav-row">
+    <button class="nav-btn btn-prev" id="btn-prev" onclick="prevWord()" disabled>← Anterior</button>
+    <button class="nav-btn btn-next" id="btn-next" onclick="nextWord()">Siguiente →</button>
+  </div>
+
+</div>
+
+<script>
+// ─── WORDS DATA ───────────────────────────────────────────────────────────────
+const WORDS = [
+  {
+    en: 'Ambitious',
+    phonetic: '/æmˈbɪʃəs/',
+    es: 'Ambicioso/a',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'She is very <strong>ambitious</strong> and works hard every day.', es: 'Ella es muy ambiciosa y trabaja duro cada día.' },
+      { en: 'To be <strong>ambitious</strong> is not a bad thing.', es: 'Ser ambicioso no es algo malo.' },
+      { en: 'He has <strong>ambitious</strong> goals for his career.', es: 'Tiene metas ambiciosas para su carrera.' }
+    ],
+    note: 'Se usa para describir a alguien que tiene fuertes deseos de alcanzar el éxito. Tiene connotación positiva en inglés. <strong>"She\'s ambitious"</strong> = Ella tiene mucha ambición.'
+  },
+  {
+    en: 'Grateful',
+    phonetic: '/ˈɡreɪtfəl/',
+    es: 'Agradecido/a',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐ Básico',
+    examples: [
+      { en: 'I am so <strong>grateful</strong> for your help.', es: 'Estoy muy agradecido por tu ayuda.' },
+      { en: 'She felt <strong>grateful</strong> after the kind gesture.', es: 'Ella se sintió agradecida después del gesto amable.' },
+      { en: 'Be <strong>grateful</strong> for what you have.', es: 'Sé agradecido por lo que tienes.' }
+    ],
+    note: '<strong>Grateful</strong> vs <strong>Thankful</strong>: ambas expresan gratitud, pero <em>grateful</em> es más profundo y emocional. <em>Thankful</em> se usa más en situaciones cotidianas.'
+  },
+  {
+    en: 'Accomplish',
+    phonetic: '/əˈkɒmplɪʃ/',
+    es: 'Lograr / Alcanzar',
+    type: 'verb',
+    typeLabel: 'Verbo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'She managed to <strong>accomplish</strong> all her goals.', es: 'Ella logró alcanzar todas sus metas.' },
+      { en: 'What did you <strong>accomplish</strong> today?', es: '¿Qué lograste hoy?' },
+      { en: 'Hard work helps you <strong>accomplish</strong> great things.', es: 'El trabajo duro te ayuda a lograr grandes cosas.' }
+    ],
+    note: '<strong>Accomplish</strong> implica completar algo con éxito. Frases comunes: <em>accomplish a goal</em>, <em>accomplish a task</em>, <em>sense of accomplishment</em> (sensación de logro).'
+  },
+  {
+    en: 'Opportunity',
+    phonetic: '/ˌɒpərˈtjuːnɪti/',
+    es: 'Oportunidad',
+    type: 'noun',
+    typeLabel: 'Sustantivo',
+    difficulty: '⭐ Básico',
+    examples: [
+      { en: 'This job is a great <strong>opportunity</strong> for me.', es: 'Este trabajo es una gran oportunidad para mí.' },
+      { en: 'Don\'t miss this <strong>opportunity</strong> to learn.', es: 'No pierdas esta oportunidad de aprender.' },
+      { en: 'Every challenge is an <strong>opportunity</strong> to grow.', es: 'Cada reto es una oportunidad para crecer.' }
+    ],
+    note: 'Plural: <strong>opportunities</strong>. Expresiones: <em>take advantage of an opportunity</em> (aprovechar una oportunidad), <em>miss an opportunity</em> (perder una oportunidad).'
+  },
+  {
+    en: 'Persistent',
+    phonetic: '/pərˈsɪstənt/',
+    es: 'Perseverante / Persistente',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐⭐⭐ Avanzado',
+    examples: [
+      { en: 'You need to be <strong>persistent</strong> to succeed.', es: 'Debes ser persistente para tener éxito.' },
+      { en: 'She was <strong>persistent</strong> even after many failures.', es: 'Ella fue persistente incluso después de muchos fracasos.' },
+      { en: 'A <strong>persistent</strong> effort always pays off.', es: 'Un esfuerzo persistente siempre vale la pena.' }
+    ],
+    note: 'Sustantivo relacionado: <strong>persistence</strong> (perseverancia). Verbo: <strong>persist</strong>. Frase famosa: <em>"Persistence is the key to success."</em>'
+  },
+  {
+    en: 'Fluent',
+    phonetic: '/ˈfluːənt/',
+    es: 'Fluido / Con fluidez',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐ Básico',
+    examples: [
+      { en: 'She is <strong>fluent</strong> in three languages.', es: 'Ella habla con fluidez tres idiomas.' },
+      { en: 'I want to be <strong>fluent</strong> in English.', es: 'Quiero hablar inglés con fluidez.' },
+      { en: 'Practice daily to become <strong>fluent</strong>.', es: 'Practica a diario para hablar con fluidez.' }
+    ],
+    note: 'El adverbio es <strong>fluently</strong>: <em>"She speaks English fluently."</em> El sustantivo es <strong>fluency</strong>: <em>"Achieve fluency in 6 months."</em>'
+  },
+  {
+    en: 'Confidence',
+    phonetic: '/ˈkɒnfɪdəns/',
+    es: 'Confianza / Seguridad',
+    type: 'noun',
+    typeLabel: 'Sustantivo',
+    difficulty: '⭐ Básico',
+    examples: [
+      { en: 'Speak with <strong>confidence</strong> and people will listen.', es: 'Habla con confianza y la gente escuchará.' },
+      { en: 'Her <strong>confidence</strong> grew after each practice.', es: 'Su confianza creció después de cada práctica.' },
+      { en: 'Building <strong>confidence</strong> takes time.', es: 'Construir confianza lleva tiempo.' }
+    ],
+    note: 'Adjetivo: <strong>confident</strong>. Frase: <em>"I am confident"</em> = Tengo confianza. No confundir con <strong>confidential</strong> (confidencial/secreto).'
+  },
+  {
+    en: 'Dedication',
+    phonetic: '/ˌdɛdɪˈkeɪʃən/',
+    es: 'Dedicación / Entrega',
+    type: 'noun',
+    typeLabel: 'Sustantivo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'Success requires <strong>dedication</strong> and effort.', es: 'El éxito requiere dedicación y esfuerzo.' },
+      { en: 'Her <strong>dedication</strong> to learning is inspiring.', es: 'Su dedicación al aprendizaje es inspiradora.' },
+      { en: 'Show <strong>dedication</strong> in everything you do.', es: 'Muestra dedicación en todo lo que haces.' }
+    ],
+    note: 'Verbo: <strong>dedicate</strong>. Frase: <em>"I dedicate myself to my studies."</em> Adjetivo: <strong>dedicated</strong> = dedicado/comprometido.'
+  },
+  {
+    en: 'Overcome',
+    phonetic: '/ˌoʊvərˈkʌm/',
+    es: 'Superar / Vencer',
+    type: 'verb',
+    typeLabel: 'Verbo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'You can <strong>overcome</strong> any obstacle with effort.', es: 'Puedes superar cualquier obstáculo con esfuerzo.' },
+      { en: 'She <strong>overcame</strong> her fear of speaking in public.', es: 'Ella superó su miedo a hablar en público.' },
+      { en: 'Together we will <strong>overcome</strong> this challenge.', es: 'Juntos superaremos este reto.' }
+    ],
+    note: 'Irregular: overcome → <strong>overcame</strong> → <strong>overcome</strong>. Frases: <em>overcome a fear</em>, <em>overcome an obstacle</em>, <em>overcome difficulties</em>.'
+  },
+  {
+    en: 'Remarkable',
+    phonetic: '/rɪˈmɑːrkəbəl/',
+    es: 'Extraordinario / Notable',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐⭐⭐ Avanzado',
+    examples: [
+      { en: 'Her progress in English is <strong>remarkable</strong>.', es: 'Su progreso en inglés es extraordinario.' },
+      { en: 'That was a <strong>remarkable</strong> performance!', es: '¡Esa fue una actuación extraordinaria!' },
+      { en: 'He did a <strong>remarkable</strong> job on the project.', es: 'Hizo un trabajo notable en el proyecto.' }
+    ],
+    note: '<strong>Remarkable</strong> = digno de mención, excepcional. Adverbio: <strong>remarkably</strong> (notablemente). Sinónimos: <em>extraordinary, outstanding, impressive</em>.'
+  },
+  {
+    en: 'Consistent',
+    phonetic: '/kənˈsɪstənt/',
+    es: 'Consistente / Constante',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'Be <strong>consistent</strong> with your daily practice.', es: 'Sé constante con tu práctica diaria.' },
+      { en: 'His results are always <strong>consistent</strong>.', es: 'Sus resultados siempre son consistentes.' },
+      { en: 'A <strong>consistent</strong> routine leads to fluency.', es: 'Una rutina constante lleva a la fluidez.' }
+    ],
+    note: 'Sustantivo: <strong>consistency</strong>. Adverbio: <strong>consistently</strong>. Frase clave: <em>"Consistency is more important than intensity."</em>'
+  },
+  {
+    en: 'Enthusiasm',
+    phonetic: '/ɪnˈθjuːziæzəm/',
+    es: 'Entusiasmo',
+    type: 'noun',
+    typeLabel: 'Sustantivo',
+    difficulty: '⭐⭐ Intermedio',
+    examples: [
+      { en: 'She approached every class with <strong>enthusiasm</strong>.', es: 'Ella abordaba cada clase con entusiasmo.' },
+      { en: 'His <strong>enthusiasm</strong> for English is contagious.', es: 'Su entusiasmo por el inglés es contagioso.' },
+      { en: 'Show <strong>enthusiasm</strong> and doors will open.', es: 'Muestra entusiasmo y las puertas se abrirán.' }
+    ],
+    note: 'Adjetivo: <strong>enthusiastic</strong>. Adverbio: <strong>enthusiastically</strong>. Frase: <em>"I am enthusiastic about learning."</em>'
+  },
+  {
+    en: 'Breakthrough',
+    phonetic: '/ˈbreɪkθruː/',
+    es: 'Avance / Logro importante',
+    type: 'noun',
+    typeLabel: 'Sustantivo',
+    difficulty: '⭐⭐⭐ Avanzado',
+    examples: [
+      { en: 'Learning 10 words a day was a real <strong>breakthrough</strong>.', es: 'Aprender 10 palabras al día fue un verdadero avance.' },
+      { en: 'She had a <strong>breakthrough</strong> with her pronunciation.', es: 'Tuvo un avance importante con su pronunciación.' },
+      { en: 'Every small step can lead to a big <strong>breakthrough</strong>.', es: 'Cada pequeño paso puede llevar a un gran avance.' }
+    ],
+    note: '<strong>Breakthrough</strong> = momento en que algo difícil finalmente funciona. También se usa en ciencia y tecnología: <em>a medical breakthrough</em> (un avance médico).'
+  },
+  {
+    en: 'Resilient',
+    phonetic: '/rɪˈzɪliənt/',
+    es: 'Resiliente / Resistente',
+    type: 'adj',
+    typeLabel: 'Adjetivo',
+    difficulty: '⭐⭐⭐ Avanzado',
+    examples: [
+      { en: 'Language learners must be <strong>resilient</strong>.', es: 'Los estudiantes de idiomas deben ser resilientes.' },
+      { en: 'She is strong and <strong>resilient</strong> after every setback.', es: 'Ella es fuerte y resiliente después de cada tropiezo.' },
+      { en: 'A <strong>resilient</strong> mindset helps you keep going.', es: 'Una mentalidad resiliente te ayuda a seguir adelante.' }
+    ],
+    note: 'Sustantivo: <strong>resilience</strong> (resiliencia). Una de las palabras más usadas en el mundo laboral y de desarrollo personal en inglés.'
+  },
+  {
+    en: 'Inspire',
+    phonetic: '/ɪnˈspaɪər/',
+    es: 'Inspirar',
+    type: 'verb',
+    typeLabel: 'Verbo',
+    difficulty: '⭐ Básico',
+    examples: [
+      { en: 'Great teachers <strong>inspire</strong> their students.', es: 'Los grandes maestros inspiran a sus estudiantes.' },
+      { en: 'Music can <strong>inspire</strong> you to study harder.', es: 'La música puede inspirarte a estudiar más.' },
+      { en: 'Let your dreams <strong>inspire</strong> your actions.', es: 'Que tus sueños inspiren tus acciones.' }
+    ],
+    note: 'Sustantivo: <strong>inspiration</strong>. Adjetivo: <strong>inspiring / inspired</strong>. Frase: <em>"That speech was very inspiring."</em> (Ese discurso fue muy inspirador.)'
+  }
+];
+
+const TYPE_CLASSES = {
+  adj: 'pill-adj', verb: 'pill-verb', noun: 'pill-noun',
+  phrase: 'pill-phrase', adv: 'pill-adv', greeting: 'pill-greeting'
+};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let current = 0;
+let seen = new Set();
+let startTime = Date.now();
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function render(idx) {
+  const w = WORDS[idx];
+  seen.add(idx);
+
+  // Progress
+  const pct = ((idx + 1) / WORDS.length) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+
+  // Day chip
+  document.getElementById('day-chip').textContent = `Día ${idx + 1}`;
+  document.getElementById('streak').textContent = seen.size;
+
+  // Dots
+  const dotsEl = document.getElementById('day-dots');
+  dotsEl.innerHTML = '';
+  WORDS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < idx ? ' seen' : i === idx ? ' current' : '');
+    dotsEl.appendChild(d);
+  });
+
+  // Word card
+  document.getElementById('w-en').textContent = w.en;
+  document.getElementById('w-phonetic').textContent = w.phonetic;
+  document.getElementById('w-es').textContent = w.es;
+  const pill = document.getElementById('w-type-pill');
+  pill.textContent = w.typeLabel;
+  pill.className = `meta-pill ${TYPE_CLASSES[w.type] || 'pill-noun'}`;
+  document.getElementById('w-difficulty').textContent = w.difficulty;
+  document.getElementById('w-note').innerHTML = w.note;
+
+  // Reset audio btn
+  setWaveStatic();
+
+  // Examples
+  const list = document.getElementById('examples-list');
+  list.innerHTML = '';
+  w.examples.forEach((ex, i) => {
+    const item = document.createElement('div');
+    item.className = 'example-item';
+    item.innerHTML = `
+      <div class="ex-num">${i + 1}</div>
+      <div class="ex-content">
+        <div class="ex-en">${ex.en}</div>
+        <div class="ex-es">${ex.es}</div>
+      </div>
+      <div class="ex-audio" onclick="speakExample('${ex.en.replace(/<[^>]+>/g,'').replace(/'/g,"\\'")}')">🔊</div>`;
+    list.appendChild(item);
+  });
+
+  // Nav buttons
+  document.getElementById('btn-prev').disabled = idx === 0;
+  const btnNext = document.getElementById('btn-next');
+  if (idx === WORDS.length - 1) {
+    btnNext.textContent = '¡Finalizar! 🎉';
+    btnNext.classList.add('finished');
+  } else {
+    btnNext.textContent = 'Siguiente →';
+    btnNext.classList.remove('finished');
+  }
+
+  // Re-trigger animations
+  ['word-card','examples-card','notes-card'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = '';
+  });
+
+  // Auto speak
+  setTimeout(() => speakMain(), 400);
+}
+
+function nextWord() {
+  if (current < WORDS.length - 1) {
+    current++;
+    render(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showComplete();
+  }
+}
+
+function prevWord() {
+  if (current > 0) {
+    current--;
+    render(current);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function showComplete() {
+  document.getElementById('word-card').style.display = 'none';
+  document.getElementById('examples-card').style.display = 'none';
+  document.getElementById('notes-card').style.display = 'none';
+  document.getElementById('nav-row').style.display = 'none';
+  const cs = document.getElementById('complete-screen');
+  cs.classList.add('show');
+  document.getElementById('cs-total').textContent = WORDS.length;
+  const mins = Math.round((Date.now() - startTime) / 60000);
+  document.getElementById('cs-time').textContent = (mins || 1) + ' min';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  current = 0; seen = new Set(); startTime = Date.now();
+  document.getElementById('word-card').style.display = '';
+  document.getElementById('examples-card').style.display = '';
+  document.getElementById('notes-card').style.display = '';
+  document.getElementById('nav-row').style.display = '';
+  document.getElementById('complete-screen').classList.remove('show');
+  render(0);
+}
+
+// ─── AUDIO ────────────────────────────────────────────────────────────────────
+let speaking = false;
+function speakText(text, onEnd) {
+  if (!window.speechSynthesis) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.82; u.pitch = 1;
+  const voices = speechSynthesis.getVoices();
+  const ev = voices.find(v => v.lang === 'en-US' && v.name.includes('Google'))
+           || voices.find(v => v.lang.startsWith('en-US'))
+           || voices.find(v => v.lang.startsWith('en'));
+  if (ev) u.voice = ev;
+  u.onstart = () => { speaking = true; };
+  u.onend   = () => { speaking = false; setWaveStatic(); if (onEnd) onEnd(); };
+  u.onerror = () => { speaking = false; setWaveStatic(); };
+  speechSynthesis.speak(u);
+}
+
+function speakMain() {
+  const w = WORDS[current];
+  setWaveAnimated();
+  const btn = document.getElementById('audio-main-btn');
+  btn.classList.add('playing');
+  speakText(w.en, () => btn.classList.remove('playing'));
+}
+
+function speakExample(text) {
+  speakText(text);
+}
+
+function setWaveAnimated() {
+  document.getElementById('wave-main').innerHTML =
+    `<div class="wb wb1"></div><div class="wb wb2"></div><div class="wb wb3"></div><div class="wb wb4"></div>`;
+}
+function setWaveStatic() {
+  document.getElementById('wave-main').innerHTML =
+    `<div class="wb-static"></div><div class="wb-static"></div><div class="wb-static"></div><div class="wb-static"></div>`;
+  document.getElementById('audio-main-btn').classList.remove('playing');
+}
+
+function popWord() {
+  const el = document.getElementById('w-en');
+  el.classList.remove('pop');
+  void el.offsetWidth;
+  el.classList.add('pop');
+  speakMain();
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
+render(0);
+</script>
+
+</body>
+</html>
