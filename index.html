@@ -123,6 +123,10 @@ background: #1e2d45; transition: background 0.3s;
   opacity: 0.12;
   top: -60px;
   right: -60px;
+  animation: glowMove 6s ease-in-out infinite alternate;
+  @keyframes glowMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-20px, 20px); }
 }
   .word-card:hover {
   transform: translateY(-6px);
@@ -218,6 +222,11 @@ border-bottom: 1px solid #1e2d45;
 padding: 14px 20px;
 border-bottom: 1px solid #1e2d45;
 display: flex; gap: 12px; align-items: flex-start;
+}
+  .example-item:hover {
+  background: rgba(91,156,246,0.05);
+  transform: translateX(4px);
+  transition: 0.2s;
 }
 .example-item:last-child { border-bottom: none; }
 .ex-num {
