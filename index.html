@@ -261,17 +261,30 @@ font-family: ‘Outfit’, sans-serif; font-size: 0.88rem; font-weight: 700;
 transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px;
 }
 .btn-prev {
-background: #0d1220; border: 1px solid #1e2d45; color: #7889aa;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(91,156,246,0.2);
+  color: #cbd5f5;
 }
-.btn-prev:hover { border-color: #5b9cf6; color: #5b9cf6; }
+.btn-prev:hover {
+  border-color: #5b9cf6;
+  color: #5b9cf6;
+  background: rgba(91,156,246,0.08);
+}
 .btn-next {
 background: linear-gradient(135deg, #00c4a7, #5b9cf6);
 color: #fff; box-shadow: 0 4px 20px rgba(0,196,167,0.25);
 }
-.btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,196,167,0.35); }
+.btn-next:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(91,156,246,0.5);
+}
 .btn-next:active { transform: translateY(0); }
-.btn-prev:disabled { opacity: 0.35; cursor: default; }
-.btn-next.finished { background: linear-gradient(135deg, #f5c842, #e8a000); box-shadow: 0 4px 20px rgba(245,200,66,0.25); }
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-next.finished { background: linear-gradient(135deg, #f5c842, #e8a000); box-shadow: 0 6px 24px rgba(91,156,246,0.35); }
 
 /* ── COMPLETE SCREEN ── */
 .complete-screen {
