@@ -33,7 +33,7 @@ body {
   flex-direction: column;
 }
 
-/* ── STARS BG ── */
+/* ── STARS  ── */
 body::before {
 content: ‘’;
 position: fixed; inset: 0; z-index: 0;
@@ -73,7 +73,7 @@ height: 3px; background: var(–border);
 }
 .progress-fill {
 height: 100%;
-background: linear-gradient(90deg, var(–teal), var(–blue));
+background: linear-gradient(90deg, #00c4a7, var(–blue));
 transition: width 0.6s cubic-bezier(.4,0,.2,1);
 }
 
@@ -94,19 +94,19 @@ display: flex; align-items: center; gap: 10px;
 font-family: ‘DM Mono’, monospace;
 font-size: 0.7rem; font-weight: 500; letter-spacing: 0.08em;
 text-transform: uppercase; padding: 4px 12px; border-radius: 20px;
-background: rgba(0,196,167,0.12); color: var(–teal); border: 1px solid rgba(0,196,167,0.25);
+background: rgba(0,196,167,0.12); color: #00c4a7; border: 1px solid rgba(0,196,167,0.25);
 }
 .day-dots { display: flex; gap: 5px; }
 .dot {
 width: 8px; height: 8px; border-radius: 50%;
 background: var(–border); transition: background 0.3s;
 }
-.dot.seen { background: var(–teal); }
-.dot.current { background: var(–gold); box-shadow: 0 0 6px var(–gold); }
+.dot.seen { background: #00c4a7; }
+.dot.current { background: #f5c842; box-shadow: 0 0 6px #f5c842; }
 
 /* ── WORD CARD ── */
 .word-card {
-background: var(–card);
+background: #111827;
 border: 1px solid var(–border);
 border-radius: 24px;
 overflow: hidden;
@@ -114,7 +114,7 @@ position: relative;
 }
 .card-glow {
 position: absolute; top: 0; left: 0; right: 0; height: 2px;
-background: linear-gradient(90deg, var(–teal), var(–blue), var(–purple));
+background: linear-gradient(90deg, #00c4a7, var(–blue), var(–purple));
 }
 .card-body { padding: 28px 26px 24px; }
 
@@ -127,8 +127,8 @@ text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
 .pill-verb     { background: rgba(167,139,250,0.15); color: var(–purple); }
 .pill-noun     { background: rgba(91,156,246,0.15); color: var(–blue); }
 .pill-adj      { background: rgba(255,107,138,0.15); color: var(–rose); }
-.pill-phrase   { background: rgba(245,200,66,0.12); color: var(–gold); }
-.pill-adv      { background: rgba(0,196,167,0.12); color: var(–teal); }
+.pill-phrase   { background: rgba(245,200,66,0.12); color: #f5c842; }
+.pill-adv      { background: rgba(0,196,167,0.12); color: #00c4a7; }
 .pill-greeting { background: rgba(52,211,153,0.12); color: var(–green); }
 .difficulty {
 font-size: 0.68rem; font-weight: 600; letter-spacing: 0.05em;
@@ -150,7 +150,7 @@ cursor: pointer; transition: opacity 0.2s;
 
 .phonetic {
 font-family: ‘DM Mono’, monospace;
-font-size: 0.88rem; color: var(–ink2);
+font-size: 0.88rem; color: #7889aa;
 margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
 }
 
@@ -181,7 +181,7 @@ transition: all 0.2s; font-family: ‘Outfit’, sans-serif;
 display: flex; align-items: center; gap: 10px;
 margin: 16px 0 10px;
 padding: 14px 16px;
-background: var(–surface);
+background: #0d1220;
 border: 1px solid var(–border);
 border-radius: 12px;
 }
@@ -191,7 +191,7 @@ border-radius: 12px;
 
 /* ── EXAMPLES ── */
 .examples-card {
-background: var(– –card); border: 1px solid var(–border);
+background: #111827; border: 1px solid var(–border);
 border-radius: 20px; overflow: hidden;
 }
 .examples-header {
@@ -199,7 +199,7 @@ padding: 14px 20px 10px;
 display: flex; align-items: center; gap: 8px;
 border-bottom: 1px solid var(–border);
 }
-.examples-header h3 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(–ink2); }
+.examples-header h3 { font-size: 0.82rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #7889aa; }
 .examples-icon { font-size: 0.9rem; }
 
 .example-item {
@@ -210,7 +210,7 @@ display: flex; gap: 12px; align-items: flex-start;
 .example-item:last-child { border-bottom: none; }
 .ex-num {
 width: 22px; height: 22px; flex-shrink: 0; border-radius: 6px;
-background: var(–surface); border: 1px solid var(–border);
+background: #0d1220; border: 1px solid var(–border);
 display: flex; align-items: center; justify-content: center;
 font-family: ‘DM Mono’, monospace; font-size: 0.68rem; color: var(–muted);
 margin-top: 2px;
@@ -219,11 +219,11 @@ margin-top: 2px;
 .ex-en {
 font-size: 0.92rem; line-height: 1.5; color: var(–ink); margin-bottom: 4px;
 }
-.ex-en strong { color: var(–gold); font-weight: 700; }
-.ex-es { font-size: 0.78rem; color: var(–ink2); font-style: italic; }
+.ex-en strong { color: #f5c842; font-weight: 700; }
+.ex-es { font-size: 0.78rem; color: #7889aa; font-style: italic; }
 .ex-audio {
 width: 30px; height: 30px; flex-shrink: 0;
-background: var(–surface); border: 1px solid var(–border);
+background: #0d1220; border: 1px solid var(–border);
 border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
 font-size: 0.85rem; transition: all 0.2s;
 }
@@ -235,8 +235,8 @@ background: rgba(245,200,66,0.05);
 border: 1px solid rgba(245,200,66,0.2);
 border-radius: 16px; padding: 16px 20px;
 }
-.notes-card h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(–gold); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.notes-card p { font-size: 0.85rem; line-height: 1.6; color: var(–ink2); }
+.notes-card h4 { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #f5c842; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.notes-card p { font-size: 0.85rem; line-height: 1.6; color: #7889aa; }
 .notes-card p strong { color: var(–ink); }
 
 /* ── NAV BUTTONS ── */
@@ -249,22 +249,22 @@ font-family: ‘Outfit’, sans-serif; font-size: 0.88rem; font-weight: 700;
 transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 7px;
 }
 .btn-prev {
-background: #0d1220; border: 1px solid var(–border); color: var(–ink2);
+background: #0d1220; border: 1px solid var(–border); color: #7889aa;
 }
 .btn-prev:hover { border-color: var(– –blue); color: var(– –blue); }
 .btn-next {
-background: linear-gradient(135deg, var(–teal), var(–blue));
+background: linear-gradient(135deg, #00c4a7, var(–blue));
 color: #fff; box-shadow: 0 4px 20px rgba(0,196,167,0.25);
 }
 .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,196,167,0.35); }
 .btn-next:active { transform: translateY(0); }
 .btn-prev:disabled { opacity: 0.35; cursor: default; }
-.btn-next.finished { background: linear-gradient(135deg, var(–gold), #e8a000); box-shadow: 0 4px 20px rgba(245,200,66,0.25); }
+.btn-next.finished { background: linear-gradient(135deg, #f5c842, #e8a000); box-shadow: 0 4px 20px rgba(245,200,66,0.25); }
 
 /* ── COMPLETE SCREEN ── */
 .complete-screen {
 display: none;
-background: var(–card); border: 1px solid var(–border);
+background: #111827; border: 1px solid var(–border);
 border-radius: 24px; padding: 44px 28px; text-align: center;
 }
 .complete-screen.show { display: block; }
@@ -273,17 +273,17 @@ border-radius: 24px; padding: 44px 28px; text-align: center;
 font-family: ‘Playfair Display’, serif;
 font-size: 1.8rem; font-weight: 900; margin-bottom: 8px;
 }
-.complete-screen h2 span { color: var(–gold); font-style: italic; }
-.complete-screen p { color: var(–ink2); font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
+.complete-screen h2 span { color: #f5c842; font-style: italic; }
+.complete-screen p { color: #7889aa; font-size: 0.9rem; line-height: 1.6; margin-bottom: 24px; }
 .complete-stats { display: flex; gap: 10px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
 .cstat {
 padding: 10px 20px; border-radius: 12px;
 font-size: 0.82rem; font-weight: 700;
-background: var(–surface); border: 1px solid var(–border);
+background: #0d1220; border: 1px solid var(–border);
 }
-.cstat span { font-family: ‘DM Mono’, monospace; font-size: 1.2rem; display: block; margin-bottom: 2px; color: var(–gold); }
+.cstat span { font-family: ‘DM Mono’, monospace; font-size: 1.2rem; display: block; margin-bottom: 2px; color: #f5c842; }
 .restart-btn {
-background: linear-gradient(135deg, var(–teal), var(–blue));
+background: linear-gradient(135deg, #00c4a7, var(–blue));
 color: #fff; border: none; border-radius: 14px;
 padding: 14px 36px; font-family: ‘Outfit’, sans-serif;
 font-size: 0.95rem; font-weight: 700; cursor: pointer;
